@@ -10,36 +10,36 @@ class App extends Component {
     super(props);
     this.state = {
       task: [
-        {
-          id: this.randomId(),
-          name: "hoc lap trinh",
-          status: true,
-        },
-        {
-          id: this.randomId(),
-          name: "di choi",
-          status: false,
-        },
-        {
-          id: this.randomId(),
-          name: "di ngu",
-          status: true,
-        },
-        {
-          id: this.randomId(),
-          name: "di an",
-          status: false,
-        },
+        // {
+        //   id: this.randomId(),
+        //   name: "hoc lap trinh",
+        //   status: true,
+        // },
+        // {
+        //   id: this.randomId(),
+        //   name: "di choi",
+        //   status: false,
+        // },
+        // {
+        //   id: this.randomId(),
+        //   name: "di ngu",
+        //   status: true,
+        // },
+        // {
+        //   id: this.randomId(),
+        //   name: "di an",
+        //   status: false,
+        // },
       ],
       checkAddForm: false,
     };
-    
   }
-  componentDidMount(){
-    localStorage.setItem('task',JSON.stringify(this.state.task));
-    this.setState({
-      task :JSON.parse(localStorage.getItem('task'))    
-    })
+  componentDidMount() {
+    if (localStorage && localStorage.getItem("task")) {
+      this.setState({
+        task: JSON.parse(localStorage.getItem("task")),
+      });
+    }
   }
   randomId() {
     return Math.random().toString(36).substring(7);
@@ -54,11 +54,21 @@ class App extends Component {
       checkAddForm: !this.state.checkAddForm,
     });
   };
-
+  receiveData = (data) => {
+    var { task } = this.state;
+    data.id = this.randomId();
+    task.push(data);
+    this.setState({
+      task: task,
+    });
+    console.log(this.state.task);
+    localStorage.setItem("task", JSON.stringify(this.state.task));
+  };
+ 
   render() {
-    localStorage.setItem('task',JSON.stringify(this.state.task));
+    var task = this.state.task;
     let displayForm = this.state.checkAddForm ? (
-      <TaskForm onCloseForm={this.onCloseForm} />
+      <TaskForm onCloseForm={this.onCloseForm} receiveData={this.receiveData} />
     ) : (
       ""
     );
@@ -91,7 +101,7 @@ class App extends Component {
             </div>
             <div className="row mt-15">
               <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <TaskList task={this.state.task}></TaskList>
+                <TaskList task={task}></TaskList>
               </div>
             </div>
           </div>
