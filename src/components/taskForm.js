@@ -3,8 +3,8 @@ class TaskForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "",
-      status: false,
+      name: this.props.dataUpdate ? this.props.dataUpdate.name : "",
+      status: this.props.dataUpdate ? this.props.dataUpdate.status : false,
     };
   }
 
@@ -25,21 +25,22 @@ class TaskForm extends Component {
   onSubmit = (e) => {
     e.preventDefault();
     this.props.receiveData(this.state);
-    this.onClear();
     this.oncloseForm();
   };
   onClear = (e) => {
-    this.setState({
-      name: "",
-      status: false,
-    });
+    this.props.onCloseForm();
+  };
+  onUpdate = (e) => {
+    e.preventDefault();
+    this.props.receiveData(this.state, this.props.dataUpdate.id);
+    this.oncloseForm();
   };
   render() {
     return (
       <div className="panel panel-warning">
         <div className="panel-heading">
           <h3 className="panel-title">
-            Thêm Công Việc{" "}
+            {this.props.update ? "Sửa " : "Thêm "}Công Việc{" "}
             <i
               className="fa fa-times-circle-o"
               aria-hidden="true"
@@ -48,7 +49,9 @@ class TaskForm extends Component {
           </h3>
         </div>
         <div className="panel-body">
-          <form onSubmit={this.onSubmit}>
+          <form
+            onSubmit={this.props.dataUpdate ? this.onUpdate : this.onSubmit}
+          >
             <div className="form-group">
               <label>Tên :</label>
               <input
@@ -73,7 +76,7 @@ class TaskForm extends Component {
             <br />
             <div className="text-center">
               <button type="submit" className="btn btn-warning">
-                Thêm
+                {this.props.dataUpdate ? "Cập nhật " : "Thêm"}
               </button>
               &nbsp;
               <button

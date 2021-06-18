@@ -4,3 +4,6 @@
 .fa-times-circle-o {
   float: right;
 }
+.label{
+  cursor: pointer;
+}

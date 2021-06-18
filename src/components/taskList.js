@@ -2,10 +2,31 @@ import React, { Component } from "react";
 
 import TaskItem from "./taskItem";
 class TaskList extends Component {
+  updateStatus = (id) => {
+  this.props.receiveIdStatus(id);
+  };
+
+  deleteActive = (id)=>{
+    this.props.receiveIdDelete(id);
+  }
+  changeActive = (id) =>{
+    this.props.receiveIdChange(id);
+  }
   render() {
     var task = this.props.task;
-    var elementTask = task.map((item,index) => {
-      return <TaskItem key={item.id} index= {index} task ={item}> </TaskItem>;
+    var elementTask = task.map((item, index) => {
+      return (
+        <TaskItem
+          key={item.id}
+          index={index}
+          task={item}
+          updateStatus={this.updateStatus}
+          deleteActive= {this.deleteActive}
+          changeActive = {this.changeActive}
+        >
+          {" "}
+        </TaskItem>
+      );
     });
 
     return (

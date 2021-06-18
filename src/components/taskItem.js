@@ -1,5 +1,17 @@
 import React, { Component } from "react";
 class TaskItem extends Component {
+  updateStatus = (e) => {
+    let id   = this.props.task.id;
+   this.props.updateStatus(id);
+  };
+  deleteActive = ()=>{
+    let id = this.props.task.id
+    this.props.deleteActive(id);
+  }
+  changeActive = ()=>{
+    let id = this.props.task.id
+    this.props.changeActive( id);
+  }
   render() {
     var { index, task } = this.props;
     return (
@@ -11,16 +23,17 @@ class TaskItem extends Component {
             className={
               task.status ? "label label-success" : "label label-warning"
             }
+            onClick={this.updateStatus}
           >
             {task.status ? "kích hoat" : "ẩn"}
           </span>
         </td>
         <td className="text-center">
-          <button type="button" className="btn btn-warning">
+          <button type="button" className="btn btn-warning" onClick = {this.changeActive}>
             <span className="fa fa-pencil mr-5"></span>Sửa
           </button>
           &nbsp;
-          <button type="button" className="btn btn-danger">
+          <button type="button" className="btn btn-danger" onClick= {this.deleteActive}>
             <span className="fa fa-trash mr-5"></span>Xóa
           </button>
         </td>

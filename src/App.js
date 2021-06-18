@@ -9,29 +9,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      task: [
-        // {
-        //   id: this.randomId(),
-        //   name: "hoc lap trinh",
-        //   status: true,
-        // },
-        // {
-        //   id: this.randomId(),
-        //   name: "di choi",
-        //   status: false,
-        // },
-        // {
-        //   id: this.randomId(),
-        //   name: "di ngu",
-        //   status: true,
-        // },
-        // {
-        //   id: this.randomId(),
-        //   name: "di an",
-        //   status: false,
-        // },
-      ],
+      task: [],
       checkAddForm: false,
+      taskEdit: null,
     };
   }
   componentDidMount() {
@@ -41,12 +21,25 @@ class App extends Component {
       });
     }
   }
+  receiveIdStatus = (id) => {
+    let { task } = this.state;
+    this.state.task.forEach((item, index) => {
+      if (item.id === id) {
+        task[index].status = !task[index].status;
+      }
+      this.setState({
+        task: task,
+      });
+    });
+    localStorage.setItem("task", JSON.stringify(this.state.task));
+  };
   randomId() {
     return Math.random().toString(36).substring(7);
   }
   addActive = (e) => {
     this.setState({
       checkAddForm: !this.state.checkAddForm,
+      taskEdit: null,
     });
   };
   onCloseForm = (e) => {
@@ -54,24 +47,83 @@ class App extends Component {
       checkAddForm: !this.state.checkAddForm,
     });
   };
-  receiveData = (data) => {
+  receiveData = (data, id) => {
     var { task } = this.state;
-    data.id = this.randomId();
-    task.push(data);
-    this.setState({
-      task: task,
+    if (id) {
+      data.id = id;
+      this.state.task.forEach((item, index) => {
+        if (item.id === id) {
+          task.splice(index, 1);
+          task.splice(index, 0, data);
+          this.setState({
+            task: task,
+          });
+          console.log(this.state.task);
+          localStorage.setItem("task", JSON.stringify(this.state.task));
+        }
+      });
+    } else {
+      data.id = this.randomId();
+      task.push(data);
+      this.setState({
+        task: task,
+      });
+      console.log(this.state.task);
+      localStorage.setItem("task", JSON.stringify(this.state.task));
+    }
+  };
+  receiveIdDelete = (data) => {
+    var { task } = this.state;
+    this.state.task.forEach((item, index) => {
+      if (item.id === data) {
+        task.splice(index, 1);
+      }
+      this.setState({
+        task: task,
+      });
     });
-    console.log(this.state.task);
     localStorage.setItem("task", JSON.stringify(this.state.task));
   };
- 
-  render() {
-    var task = this.state.task;
+  receiveIdChange = (data) => {
+    let { task } = this.state;
+
+    this.state.task.forEach((item, index) => {
+      if (item.id === data) {
+        this.setState({
+          taskEdit: data,
+          checkAddForm: !this.state.checkAddForm,
+        });
+      }
+    });
+    this.showUpdate();
+  };
+  showUpdate = () => {
+    let dataUpdate;
     let displayForm = this.state.checkAddForm ? (
       <TaskForm onCloseForm={this.onCloseForm} receiveData={this.receiveData} />
     ) : (
       ""
     );
+    this.state.task.forEach((item, index) => {
+      if (item.id === this.state.taskEdit) {
+        dataUpdate = item;
+      }
+    });
+    let updateForm = this.state.checkAddForm ? (
+      <TaskForm
+        onCloseForm={this.onCloseForm}
+        receiveData={this.receiveData}
+        update={true}
+        dataUpdate={dataUpdate}
+      />
+    ) : (
+      ""
+    );
+    return this.state.taskEdit ? updateForm : displayForm;
+  };
+  render() {
+    var task = this.state.task;
+    let displayForm = this.showUpdate();
     return (
       <div className="container">
         <div className="text-center">
@@ -101,7 +153,12 @@ class App extends Component {
             </div>
             <div className="row mt-15">
               <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <TaskList task={task}></TaskList>
+                <TaskList
+                  task={task}
+                  receiveIdStatus={this.receiveIdStatus}
+                  receiveIdDelete={this.receiveIdDelete}
+                  receiveIdChange={this.receiveIdChange}
+                ></TaskList>
               </div>
             </div>
           </div>
