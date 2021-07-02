@@ -25,7 +25,7 @@ class TaskItem extends Component {
             }
             onClick={this.updateStatus}
           >
-            {task.status ? "kích hoat" : "ẩn"}
+            {task.status ? "Kích Hoạt" : "Ẩn"}
           </span>
         </td>
         <td className="text-center">

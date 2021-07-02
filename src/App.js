@@ -12,6 +12,11 @@ class App extends Component {
       task: [],
       checkAddForm: false,
       taskEdit: null,
+      filter: {
+        filterName: "",
+        filterStatus: -1,
+      },
+      keyWord: "",
     };
   }
   componentDidMount() {
@@ -68,7 +73,6 @@ class App extends Component {
       this.setState({
         task: task,
       });
-      console.log(this.state.task);
       localStorage.setItem("task", JSON.stringify(this.state.task));
     }
   };
@@ -97,6 +101,7 @@ class App extends Component {
     });
     this.showUpdate();
   };
+
   showUpdate = () => {
     let dataUpdate;
     let displayForm = this.state.checkAddForm ? (
@@ -121,9 +126,43 @@ class App extends Component {
     );
     return this.state.taskEdit ? updateForm : displayForm;
   };
+  receiveValueFilter = (data) => {
+    this.setState({
+      filter: {
+        filterName: data.filterName.toLowerCase(),
+        filterStatus: parseInt(data.filterStatus),
+      },
+    });
+  };
+  receiveKeyWord = (keyWord) => {
+    this.setState({
+      keyWord: keyWord.keyWord,
+    });
+  };
   render() {
+    console.log(this.state.keyWord);
     var task = this.state.task;
     let displayForm = this.showUpdate();
+    let filter = this.state.filter;
+    if (filter) {
+      task = task.filter((item) => {
+        return item.name.toLowerCase().indexOf(filter.filterName) !== -1;
+      });
+    }
+    task = task.filter((item) => {
+      if (filter.filterStatus === -1) {
+        return item;
+      } else {
+        return item.status === (filter.status === 1 ? true : false);
+      }
+    });
+    if (this.state.keyWord) {
+      task = task.filter((item) => {
+        if (item.name.toLowerCase().indexOf(this.state.keyWord) !== -1) {
+          return item;
+        }
+      });
+    }
     return (
       <div className="container">
         <div className="text-center">
@@ -149,7 +188,7 @@ class App extends Component {
               <span className="fa fa-plus mr-5"></span>Thêm Công Việc
             </button>
             <div className="row mt-15">
-              <Control></Control>
+              <Control receiveKeyWord={this.receiveKeyWord}></Control>
             </div>
             <div className="row mt-15">
               <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -158,6 +197,7 @@ class App extends Component {
                   receiveIdStatus={this.receiveIdStatus}
                   receiveIdDelete={this.receiveIdDelete}
                   receiveIdChange={this.receiveIdChange}
+                  receiveValueFilter={this.receiveValueFilter}
                 ></TaskList>
               </div>
             </div>
