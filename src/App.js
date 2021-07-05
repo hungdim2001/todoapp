@@ -17,6 +17,10 @@ class App extends Component {
         filterStatus: -1,
       },
       keyWord: "",
+      sort: {
+        sortStatus: "name",
+        status: 1,
+      },
     };
   }
   componentDidMount() {
@@ -139,11 +143,20 @@ class App extends Component {
       keyWord: keyWord.keyWord,
     });
   };
+  onSort = (data) => {
+    this.setState({
+      sort: {
+        sortStatus: data.sortStatus,
+        status: data.status,
+      },
+    });
+  };
   render() {
-    console.log(this.state.keyWord);
     var task = this.state.task;
     let displayForm = this.showUpdate();
     let filter = this.state.filter;
+    let sort = this.state.sort;
+
     if (filter) {
       task = task.filter((item) => {
         return item.name.toLowerCase().indexOf(filter.filterName) !== -1;
@@ -162,6 +175,41 @@ class App extends Component {
           return item;
         }
       });
+    }
+    if (sort.sortStatus) {
+      if (sort.sortStatus === "name" && sort.status === 1) {
+        task.sort(function (a, b) {
+          var textA = a.name.toUpperCase();
+          var textB = b.name.toUpperCase();
+
+          return textA.localeCompare(textB);
+        });
+      } else if (sort.sortStatus === "name" && sort.status === -1) {
+        task.sort(function (a, b) {
+          var textA = a.name.toUpperCase();
+          var textB = b.name.toUpperCase();
+
+          return textB.localeCompare(textA);
+        });
+      } else if (sort.sortStatus === "status" && sort.status === 1) {
+        let newArr = [];
+        newArr = task.filter((item) => item.status === true);
+        task.forEach((item) => {
+          if (item.status === false) {
+            newArr.push(item);
+          }
+        });
+        task = newArr;
+      } else {
+        let newArr = [];
+        newArr = task.filter((item) => item.status === false);
+        task.forEach((item) => {
+          if (item.status === true) {
+            newArr.push(item);
+          }
+        });
+        task = newArr;
+      }
     }
     return (
       <div className="container">
@@ -188,7 +236,11 @@ class App extends Component {
               <span className="fa fa-plus mr-5"></span>Thêm Công Việc
             </button>
             <div className="row mt-15">
-              <Control receiveKeyWord={this.receiveKeyWord}></Control>
+              <Control
+                receiveKeyWord={this.receiveKeyWord}
+                onSort={this.onSort}
+                sort={this.state.sort}
+              ></Control>
             </div>
             <div className="row mt-15">
               <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
